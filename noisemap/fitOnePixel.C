@@ -6,6 +6,9 @@
   TH2D * means  = new TH2D("means", "", 128, 0, 127, 128, 0, 127);
   TH2D * widths  = new TH2D("widths", "", 128, 0, 127, 128, 0, 127);
 
+  TH1D * means1d  = new TH1D("means1d", "", 256, 0, 255);
+  TH1D * widths1d  = new TH1D("widths1d", "", 50, 0, 10);
+
 
   int i = 7;
   bool longc = false;
@@ -89,6 +92,9 @@
       TF1 *fit1 = pixel_scurve[k][j]->GetFunction("gaus");
       means->Fill(k,j,fit1->GetParameter(1));
       widths->Fill(k,j,fit1->GetParameter(2));
+      means1d->Fill(fit1->GetParameter(1));
+      widths1d->Fill(fit1->GetParameter(2));
+
     }
   }
   std::cout << std::endl;
@@ -110,6 +116,20 @@
   widths->GetZaxis()->SetTitle("#sigma(threshold_LSB)");
   widths->GetZaxis()->SetTitleOffset(1.5);
   c2->Print("widths.png");
+
+  TCanvas *c3 = new TCanvas("c3","",0,0,700,700);
+  widths1d->Draw();
+  widths1d->GetXaxis()->SetTitle("#sigma(threshold_LSB)");
+  widths1d->GetYaxis()->SetTitle("pixels");
+  widths1d->GetYaxis()->SetTitleOffset(1.3);
+  c2->Print("widths_dist.png");
+
+  TCanvas *c4 = new TCanvas("c4","",0,0,700,700);
+  means1d->Draw();
+  means1d->GetXaxis()->SetTitle("<threshold_LSB>");
+  means1d->GetYaxis()->SetTitle("pixels");
+  means1d->GetYaxis()->SetTitleOffset(1.3);
+  c1->Print("means_dist.png");
 
   outf->Write();
 
