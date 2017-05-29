@@ -237,6 +237,7 @@ void fitOnePixel() {
   gr->Fit("pol1","");
   TF1 *fit1 = gr->GetFunction("pol1");
   std::cout << "p0: " << fit1->GetParameter("p0");
+  std::cout << "p1: " << fit1->GetParameter("p1");
   
   gr->SetTitle("SCurve pos. relative to noise");
   gr->GetXaxis()->SetTitle("test_cap_1_MSB");
