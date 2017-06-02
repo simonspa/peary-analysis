@@ -98,7 +98,7 @@ void fitOnePixel() {
   for(int k = 0; k < 128; k++) {
     for(int j = 0; j < 128; j++) {
       if(pixel_scurve[k][j]->GetEntries() < 1) continue;
-      std::cout << ".";
+      //std::cout << ".";
 
       // Calculate the range:
       Int_t bin1 = pixel_scurve[k][j]->FindLastBinAbove(2000);
@@ -111,6 +111,11 @@ void fitOnePixel() {
       Int_t bin3 = pixel_scurve[k][j]->FindLastBinAbove(1000);
       Int_t range_edge = pixel_scurve[k][j]->GetXaxis()->GetBinCenter(bin3);
 
+      // Pixels with spike issues:
+      if(bin1 > -1 && (bin2-bin1) < 50) {
+	std::cout << "Potential spike issue: " << k << " " << j << ", distance spike to zero-response: " << (bin2-bin1) << std::endl;
+      }
+      
       TF1 *fit1 = new TF1( "fitFcn", fitFunction, range_low + 5, range_high, 3);
       fit1->SetParName( 0, "mid" );
       fit1->SetParName( 1, "sigma" );
@@ -125,7 +130,7 @@ void fitOnePixel() {
 
       pixel_scurve[k][j]->Fit("fitFcn", "QWR", "ep" );// R = range from fitFcn; W -> weight=1
 
-      if(fit1->GetParameter(1) < 0 || fit1->GetParameter(1) > 20 || fit1->GetParError(1) > 0.1) {
+      if(fit1->GetParameter(1) < 0 || fit1->GetParameter(1) > 20) {
 	std::cout << "Pixel " << k << " " << j << " out-of-bound sigma: " << fit1->GetParameter(1) << std::endl;
 	  sigcnt++;
 	  continue;
