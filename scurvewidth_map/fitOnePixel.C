@@ -49,7 +49,7 @@ void fitOnePixel() {
 
       std::string name = "noise_" + h.str();
 
-      std::ifstream pxfile("data-incl-noise/" + s.str());
+      std::ifstream pxfile("data-incl-noise-2/" + s.str());
       if(!pxfile.is_open()) {
 	std::cout << "Could not open matrix file \"" << s.str() << "\"" << std::endl;
 	continue;
@@ -111,6 +111,20 @@ void fitOnePixel() {
       Int_t bin3 = pixel_scurve[k][j]->FindLastBinAbove(1000);
       Int_t range_edge = pixel_scurve[k][j]->GetXaxis()->GetBinCenter(bin3);
 
+      // Check for pixels with dips:
+      Int_t numberofbins = pixel_scurve[k][j]->GetSize();
+      Int_t xprev = 0;
+      Int_t xprevprev = 0;
+      for(int i = 1; i < numberofbins-1; i++) {
+        Int_t x = pixel_scurve[k][j]->GetBinContent(i);
+        if (xprevprev - xprev > 500 && x - xprev > 500) {
+	  std::cout << "Potential dip issue: " << k << " " << j << ", dip depth: " << (xprev-x) << ", position " << pixel_scurve[k][j]->GetXaxis()->GetBinCenter(i) << std::endl;
+	  break;
+        }
+	xprevprev = xprev;
+	xprev = x;
+    }
+      
       // Pixels with spike issues:
       if(bin1 > -1 && (bin2-bin1) < 50) {
 	std::cout << "Potential spike issue: " << k << " " << j << ", distance spike to zero-response: " << (bin2-bin1) << std::endl;
